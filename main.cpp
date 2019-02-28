@@ -230,7 +230,7 @@ void local_search(slideshow& ss, bool do_not_remove = false)
             }
             frame f(best_photo_index, -1);
             ss.insert_after_index(best_position_to_insert_after, &f); // DONE
-            horizontal_availables.erase(std::remove(vec.begin(), vec.end(), best_photo_index), vec.end());
+            horizontal_availables.erase(std::remove(horizontal_availables.begin(), horizontal_availables.end(), best_photo_index), horizontal_availables.end());
         } else {
             x++;
         }
@@ -279,8 +279,8 @@ void local_search(slideshow& ss, bool do_not_remove = false)
             }
             frame f(min_of_the_pair, max_of_the_pair);
             ss.insert_after_index(best_position_to_insert_after, &f); // DONE
-            vertical_availables.erase(std::remove(vec.begin(), vec.end(), best_photo_index1), vec.end());
-            vertical_availables.erase(std::remove(vec.begin(), vec.end(), best_photo_index2), vec.end());
+            vertical_availables.erase(std::remove(vertical_availables.begin(), vertical_availables.end(), best_photo_index1), vertical_availables.end());
+            vertical_availables.erase(std::remove(vertical_availables.begin(), vertical_availables.end(), best_photo_index2), vertical_availables.end());
         } else {
             x++;
         }
