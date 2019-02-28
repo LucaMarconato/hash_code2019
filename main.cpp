@@ -32,52 +32,6 @@ void xorshift_init()
 
 //------------------------------
 
-typedef unsigned short d; //distance
-typedef int pi;        //photo index 
-typedef int ti;
-
-struct frame {
-    frame(pi p1, pi p2){
-        set_union(pictures[p1].tags.begin(), pictures[p1].tags.end(),pictures[p2].tags.begin(), pictures[p2].tags.end(),inserter(tags,tags.begin()));
-    }
-    
-    d niceness(frame& other) {
-        set<ti> tmp;
-        set_intersection(tags.begin(),tags.end(),other.tags.begin(),other.tags.end(),tmp.begin());
-        int m=tmp.count();
-        tmp.clear();
-        set_difference(tags.begin(),tags.end(),other.tags.begin(),other.tags.end(),tmp.begin());
-        m=min(m,tmp.count());
-        tmp.clear();
-        set_difference(other.tags.begin(),other.tags.end(),tags.begin(),tags.end(),tmp.begin());
-        m=min(m,tmp.count());
-        return m;
-    }
-    
-    set<ti> tags; 
-    list<pi> images;
-};
-
-struct slideshow
-{
-    typedef iTerator list<frame*>::iterator;
-    int size(){data.size();}
-    void remove_at_index(iTerator idx){data.erase(idx);}
-    void insert_after_index(iTerator idx, frame* fr){data.insert(idx,fr);}
-    int score_of_inserting_after_index(iTerator idx, frame* fr){
-        auto next=idx;
-        next++;
-        return static_cast<int>((*idx)->niceness(*(*fr)))-static_cast<int>((*idx)->niceness(*(*next)));
-    }
-    int score_between_two_positions(iTerator idx){
-        auto next=idx;
-        next++;
-        return static_cast<int>((*idx)->niceness(*(*next)));
-    }
-    
-    list<frame*> data;
-}
-
 map<string, int> tags_dictionary;
 struct photo {
     bool vertical;
@@ -147,6 +101,54 @@ int score_between_a_photo_and_two_vertical(int p1, int v1, int v2)
     return score;
 }
 
+//----------------------------------------------------------------------------------------------------
+typedef unsigned short d; //distance
+typedef int pi;        //photo index 
+typedef int ti;
+
+struct frame {
+    frame(pi p1, pi p2){
+        set_union(pictures[p1].tags.begin(), pictures[p1].tags.end(),pictures[p2].tags.begin(), pictures[p2].tags.end(),inserter(tags,tags.begin()));
+    }
+    
+    d niceness(frame& other) {
+        set<ti> tmp;
+        set_intersection(tags.begin(),tags.end(),other.tags.begin(),other.tags.end(),tmp.begin());
+        int m=tmp.count();
+        tmp.clear();
+        set_difference(tags.begin(),tags.end(),other.tags.begin(),other.tags.end(),tmp.begin());
+        m=min(m,tmp.count());
+        tmp.clear();
+        set_difference(other.tags.begin(),other.tags.end(),tags.begin(),tags.end(),tmp.begin());
+        m=min(m,tmp.count());
+        return m;
+    }
+    
+    set<ti> tags; 
+    list<pi> images;
+};
+
+struct slideshow
+{
+    typedef iTerator list<frame*>::iterator;
+    int size(){data.size();}
+    void remove_at_index(iTerator idx){data.erase(idx);}
+    void insert_after_index(iTerator idx, frame* fr){data.insert(idx,fr);}
+    int score_of_inserting_after_index(iTerator idx, frame* fr){
+        auto next=idx;
+        next++;
+        return static_cast<int>((*idx)->niceness(*(*fr)))-static_cast<int>((*idx)->niceness(*(*next)));
+    }
+    int score_between_two_positions(iTerator idx){
+        auto next=idx;
+        next++;
+        return static_cast<int>((*idx)->niceness(*(*next)));
+    }
+    
+    list<frame*> data;
+}
+//----------------------------------------------------------------------------------------------------
+
 int main(int argc, char* argv[])
 {
     xorshift_init();
@@ -206,6 +208,8 @@ void local_search(slideshow& ss, bool do_not_remove = false)
                     }
                 }
             }
+            ss.insert_after_index(best_position_to_insert_after, best_photo_index);
+            horizontal_availables.remove(best_photo_index);
         } else {
             x++;
         }
@@ -228,6 +232,9 @@ void local_search(slideshow& ss, bool do_not_remove = false)
                     j++;
                     continue;
                 }
+                if(photo_to_insert1 == photo_to_insert2) {
+                    continue;
+                }
                 for (auto& photo_to_insert2 : vertical_availables) {
                     for (int i = 0; i < slideshow_size - 1; i++) {
                         int min_of_the_pair = min(photo_to_insert1, photo_to_insert2);
@@ -244,6 +251,9 @@ void local_search(slideshow& ss, bool do_not_remove = false)
                 }
                 j++;
             }
+            ss.insert_after_index(best_position_to_insert_after, best_photo_index1, best_photo_index2);
+            vertical_availables.remove(best_photo_index1);
+            vertical_availables.remove(best_photo_index2);
         } else {
             x++;
         }
@@ -265,6 +275,11 @@ void local_search(slideshow& ss, bool do_not_remove = false)
             }
         }
         ss.remove_at_index(i); // TO BE IMPLEMENTED
+        if(photos[i].vertical) {
+            vertical_availables.insert(i);
+        } else {
+            horizontal_availables.insert(i);
+        }
         // here I add another one
         local_search(f, do_not_remove = true;)
             }
