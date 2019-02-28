@@ -33,20 +33,44 @@ void xorshift_init()
 //------------------------------
 
 typedef unsigned short d; //distance
-typedef int phi;        //photo index 
+typedef int pi;        //photo index 
 typedef int ti;
 
 struct frame {
-    frame(picture* p1, picture p2){
-        
+    frame(pi p1, pi p2){
+        set_union(pictures[p1].tags.begin(), pictures[p1].tags.end(),pictures[p2].tags.begin(), pictures[p2].tags.end(),inserter(tags,tags.begin()));
     }
-    d niceness(frame* other) {
-        
+    
+    d niceness(frame& other) {
+        set<ti> tmp;
+        set_intersection(tags.begin(),tags.end(),other.tags.begin(),other.tags.end(),tmp.begin());
+        int m=tmp.count();
+        tmp.clear();
+        set_difference(tags.begin(),tags.end(),other.tags.begin(),other.tags.end(),tmp.begin());
+        m=min(m,tmp.count());
+        tmp.clear();
+        set_difference(other.tags.begin(),other.tags.end(),tags.begin(),tags.end(),tmp.begin());
+        m=min(m,tmp.count());
+        return m;
     }
-    vector<ti> tags; 
-    list<phi> images;
-}
+    
+    set<ti> tags; 
+    list<pi> images;
+};
 
+struct slideshow
+{
+    typedef iTerator list<frame*>::iterator;
+    int size(){data.size();}
+    void remove_at_index(iTerator idx){data.erase(idx);}
+    void insert_after_index(iTerator idx, frame* fr){data.insert(idx,fr);}
+    int score_of_inserting_after_index(iTerator idx, frame* fr){
+        auto next=idx;
+        next++;
+        return static_cast<int>((*idx)->niceness(*(*fr)))-static_cast<int>((*idx)->niceness(*(*next)));
+    }
+    list<frame*> data;
+}
 
 map<string, int> tags_dictionary;
 struct photo {
