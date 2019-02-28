@@ -43,7 +43,9 @@ struct slideshow
     void remove_at_index(iTerator idx){data.erase(idx);}
     void insert_after_index(iTerator idx, frame* fr){data.insert(idx,fr);}
     int score_of_inserting_after_index(iTerator idx, frame* fr){
-        
+        auto next=idx;
+        next++;
+        return static_cast<int>((*idx)->niceness(*(*fr)))-static_cast<int>((*idx)->niceness(*(*next)));
     }
     list<frame*> data;
 }
