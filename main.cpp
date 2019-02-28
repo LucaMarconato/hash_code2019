@@ -107,10 +107,21 @@ typedef int pi;           // photo index
 typedef int ti;
 
 struct frame {
-    frame(pi p1, pi p2) { set_union(pictures[p1].tags.begin(), pictures[p1].tags.end(), pictures[p2].tags.begin(), pictures[p2].tags.end(), inserter(tags, tags.begin())); }
-
-    d niceness(frame& other)
-    {
+    frame(pi p1, pi p2){
+        if(p2==-1){
+            tags=photos[p1].tags;
+            images.push_front(p1);
+        } else {
+            set_union(photos[p1].tags.begin(), photos[p1].tags.end(),photos[p2].tags.begin(), photos[p2].tags.end(),inserter(tags,tags.begin()));
+            images.push_front(p1);
+            images.push_front(p2);
+        }
+    }
+    ~frame(){
+        tags.clear();
+        images.clear();
+    }    
+    d niceness(frame& other) {
         set<ti> tmp;
         set_intersection(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), tmp.begin());
         int m = tmp.count();
@@ -144,7 +155,8 @@ struct slideshow {
         next++;
         return static_cast<int>((*idx)->niceness(*(*next)));
     }
-
+    iTerator begin(){return data.begin();}
+    iTerator end(){return data.end();}
     list<frame*> data;
 }
 //----------------------------------------------------------------------------------------------------
