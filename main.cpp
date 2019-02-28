@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -10,19 +11,41 @@
 
 using namespace std;
 
+//------------------------------FAST RANDOM NUMBER GENERATOR
+static int x;
+
+int xorshift()
+{
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    return x;
+}
+
+void xorshift_init()
+{
+    x = time(NULL);
+    xorshift();
+    xorshift();
+    xorshift();
+}
+
+//------------------------------
+
 map<string, int> tags_dictionary;
 struct photo {
     bool vertical;
     set<int> tags;
 };
-int added_tags = 0;
+int total_photos = 0;
+int total_tags = 0;
 map<pair<int, int>, set<int>> tags_of_pairs_of_vertical_photos;
 photo photos[100000];
 set<int> vertical_availables;
 set<int> horizontal_availables;
 
 void test();
-void local_search();
+void local_search(slideshow& ss, bool do_not_remove = false);
 
 int score_between_two_set_of_tags(set<int>& set1, set<int>& set2)
 {
@@ -80,18 +103,19 @@ int score_between_a_photo_and_two_vertical(int p1, int v1, int v2)
 
 int main(int argc, char* argv[])
 {
+    xorshift_init();
     string filename = argv[1] + (string) "_example.txt";
     ifstream in(filename);
     int lines;
     in >> lines;
-    for (int i = 0; i < lines; i++) {
+    for (; total_photos < lines; total_photos++) {
         char orientation;
         in >> orientation;
-        photos[i].vertical = orientation == 'V';
-        if (photos[i].vertical) {
-            vertical_availables.insert(i);
+        photos[total_photos].vertical = orientation == 'V';
+        if (photos[total_photos].vertical) {
+            vertical_availables.insert(total_photos);
         } else {
-            horizontal_availables.insert(i);
+            horizontal_availables.insert(total_photos);
         }
         int tags_count;
         in >> tags_count;
@@ -99,12 +123,12 @@ int main(int argc, char* argv[])
         for (int j = 0; j < tags_count; j++) {
             in >> tag;
             if (tags_dictionary.find(tag) == tags_dictionary.end()) {
-                tags_dictionary[tag] = added_tags;
-                photos[i].tags.insert(added_tags);
-                added_tags++;
+                tags_dictionary[tag] = total_tags;
+                photos[total_photos].tags.insert(total_tags);
+                total_tags++;
             } else {
                 int i_tag = tags_dictionary.at(tag);
-                photos[i].tags.insert(i_tag);
+                photos[total_photos].tags.insert(i_tag);
             }
         }
     }
@@ -116,7 +140,90 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void local_search() {}
+void local_search(slideshow& ss, bool do_not_remove = false)
+{
+    xorshift();
+    if (x % 3 == 0) {
+        // insert a new horizontal picture or go to the next move
+        if (horizontal_availables.size() > 0) {
+            int slideshow_size = ss.size(); // TO BE IMPLEMENTED
+            int best_photo_index = -1;
+            int best_position_to_insert_after = -1;
+            int best_score = -1;
+            for (auto& photo_to_insert : horizontal_availables) {
+                for (int i = 0; i < slideshow_size - 1; i++) {
+                    int candidate_score = ss.score_of_inserting_after_index(i, photo_to_insert); // TO BE IMPLEMENTED
+                    if (candidate_score > best_score) {
+                        best_score = candidate_score;
+                        best_position_to_insert_after = i;
+                        best_photo_index = photo_to_insert;
+                    }
+                }
+            }
+        } else {
+            x++;
+        }
+    }
+    if (x % 3 == 1) {
+        // insert a new pair of vertical pictures or go to the next move
+        if (vertical_availables.size() > 2) {
+            int slideshow_size = ss.size(); // TO BE IMPLEMENTED
+            int best_photo_index1 = -1;
+            int best_photo_index2 = -1;
+            int best_position_to_insert_after = -1;
+            int best_score = -1;
+            int max_vertical_to_analyze = 1000;
+            int vertical_analyzed = 0;
+            xorshift();
+            int random_vertical = x % vertical_availables.size();
+            int j = 0;
+            for (auto& photo_to_insert1 : vertical_availables) {
+                if (j < random_vertical) {
+                    j++;
+                    continue;
+                }
+                for (auto& photo_to_insert2 : vertical_availables) {
+                    for (int i = 0; i < slideshow_size - 1; i++) {
+                        int min_of_the_pair = min(photo_to_insert1, photo_to_insert2);
+                        int max_of_the_pair = max(photo_to_insert1, photo_to_insert2);
+                        int candidate_score = ss.score_of_inserting_two_verticals_after_index(i, min_of_the_pair, max_of_the_pair); // TO BE IMPLEMENTED
+                        if (candidate_score > best_score) {
+                            best_score = candidate_score;
+                            best_position_to_insert_after = i;
+                            best_photo_index1 = photo_to_insert1;
+                            best_photo_index2 = photo_to_insert2;
+                        }
+                    }
+                    vertical_analyzed++;
+                }
+                j++;
+            }
+        } else {
+            x++;
+        }
+    }
+    if (x % 3 == 2) {
+        if (do_not_remove) {
+            local_search(f, do_not_remove = true);
+        }
+        // remove one picture and add another one
+        // here I remove one picture
+        int slideshow_size = ss.size();         // TO BE IMPLEMENTED
+        int min_score = 100000;
+        int min_position = -1;
+        for(int i = 1; i < slideshow_size-1; i++) {
+            int score = score_between_two_positions(i - 1, i) + score_between_two_positions(i, i + 1);
+            if(score < min_score) {
+                min_score = score;
+                min_position = i;
+            }
+        }
+        ss.remove_at_index(i); // TO BE IMPLEMENTED
+        // here I add another one
+        local_search(f, do_not_remove = true;)
+            }
+    local_search(f);
+}
 
 void test()
 {
@@ -132,5 +239,5 @@ void test()
     }
     std::cout << score_between_two_photos(2, 3) << "\n";
     std::cout << score_between_a_photo_and_two_vertical(1, 0, 3) << "\n";
-    cout << "added_tags = " << added_tags << "\n";
+    cout << "total_tags = " << total_tags << "\n";
 }
