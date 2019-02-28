@@ -32,6 +32,22 @@ void xorshift_init()
 
 //------------------------------
 
+typedef unsigned short d; //distance
+typedef int phi;        //photo index 
+typedef int ti;
+
+struct frame {
+    frame(picture* p1, picture p2){
+        
+    }
+    d niceness(frame* other) {
+        
+    }
+    vector<ti> tags; 
+    list<phi> images;
+}
+
+
 map<string, int> tags_dictionary;
 struct photo {
     bool vertical;
