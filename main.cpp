@@ -123,13 +123,13 @@ struct frame {
     d niceness(frame& other)
     {
         set<ti> tmp;
-        set_intersection(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), tmp.begin());
+        set_intersection(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), inserter(tmp, tmp.begin()));
         size_t m = tmp.size();
         tmp.clear();
-        set_difference(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), tmp.begin());
+        set_difference(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), inserter(tmp, tmp.begin()));
         m = min(m, tmp.size());
         tmp.clear();
-        set_difference(other.tags.begin(), other.tags.end(), tags.begin(), tags.end(), tmp.begin());
+        set_difference(other.tags.begin(), other.tags.end(), tags.begin(), tags.end(), inserter(tmp, tmp.begin()));
         m = min(m, tmp.size());
         return m;
     }
@@ -230,7 +230,7 @@ void local_search(slideshow& ss, bool do_not_remove = false)
             }
             frame f(best_photo_index, -1);
             ss.insert_after_index(best_position_to_insert_after, &f); // DONE
-            horizontal_availables.erase(std::remove(horizontal_availables.begin(), horizontal_availables.end(), best_photo_index), horizontal_availables.end());
+            horizontal_availables.erase(horizontal_availables.find(best_photo_index));
         } else {
             x++;
         }
