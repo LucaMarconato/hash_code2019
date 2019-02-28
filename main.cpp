@@ -139,7 +139,7 @@ struct frame {
 };
 
 struct slideshow {
-    typedef iTerator list<frame*>::iterator;
+    typedef list<frame*>::iterator iTerator;
     int size() { data.size(); }
     void remove_at_index(iTerator idx) { data.erase(idx); }
     void insert_after_index(iTerator idx, frame* fr) { data.insert(idx, fr); }
