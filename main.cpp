@@ -230,7 +230,7 @@ void local_search(slideshow& ss, bool do_not_remove = false)
             }
             frame f(best_photo_index, -1);
             ss.insert_after_index(best_position_to_insert_after, &f); // DONE
-            horizontal_availables.remove(best_photo_index);
+            horizontal_availables.erase(std::remove(vec.begin(), vec.end(), best_photo_index), vec.end());
         } else {
             x++;
         }
@@ -279,8 +279,8 @@ void local_search(slideshow& ss, bool do_not_remove = false)
             }
             frame f(min_of_the_pair, max_of_the_pair);
             ss.insert_after_index(best_position_to_insert_after, &f); // DONE
-            vertical_availables.remove(best_photo_index1);
-            vertical_availables.remove(best_photo_index2);
+            vertical_availables.erase(std::remove(vec.begin(), vec.end(), best_photo_index1), vec.end());
+            vertical_availables.erase(std::remove(vec.begin(), vec.end(), best_photo_index2), vec.end());
         } else {
             x++;
         }
@@ -313,24 +313,24 @@ void local_search(slideshow& ss, bool do_not_remove = false)
             horizontal_availables.insert(i);
         }
         // here I add another one
-        local_search(f, do_not_remove = true;)
+        local_search(f, true);
     }
-    local_search(f);
+    local_search(ss);
 }
 
 void test()
 {
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            std::cout << score_between_two_photos(i, j) << " ";
-        }
-        std::cout << score_between_a_photo_and_two_vertical(i, 0, 3) << " ";
-        std::cout << "\n";
-    }
-    for (int j = 0; j < 4; j++) {
-        std::cout << score_between_a_photo_and_two_vertical(j, 0, 3) << " ";
-    }
-    std::cout << score_between_two_photos(2, 3) << "\n";
-    std::cout << score_between_a_photo_and_two_vertical(1, 0, 3) << "\n";
-    cout << "total_tags = " << total_tags << "\n";
+//     for (int i = 0; i < 4; i++) {
+//         for (int j = 0; j < 4; j++) {
+//             std::cout << score_between_two_photos(i, j) << " ";
+//         }
+//         std::cout << score_between_a_photo_and_two_vertical(i, 0, 3) << " ";
+//         std::cout << "\n";
+//     }
+//     for (int j = 0; j < 4; j++) {
+//         std::cout << score_between_a_photo_and_two_vertical(j, 0, 3) << " ";
+//     }
+//     std::cout << score_between_two_photos(2, 3) << "\n";
+//     std::cout << score_between_a_photo_and_two_vertical(1, 0, 3) << "\n";
+//     cout << "total_tags = " << total_tags << "\n";
 }
