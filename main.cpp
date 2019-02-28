@@ -124,7 +124,7 @@ struct frame {
     {
         set<ti> tmp;
         set_intersection(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), tmp.begin());
-        int m = tmp.size();
+        size_t m = tmp.size();
         tmp.clear();
         set_difference(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), tmp.begin());
         m = min(m, tmp.size());
