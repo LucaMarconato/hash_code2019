@@ -21,7 +21,7 @@ struct frame {
     d niceness(frame* other) {
         
     }
-    vector<ti> tags; 
+    set<ti> tags; 
     list<pi> images;
 }
 
