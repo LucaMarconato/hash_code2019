@@ -21,6 +21,8 @@ map<pair<int, int>, set<int>> tags_of_pairs_of_vertical_photos;
 
 photo photos[100000];
 
+void test();
+
 int score_between_two_set_of_tags(set<int>& set1, set<int>& set2)
 {
     set<int> intersection, diff1, diff2;
@@ -101,6 +103,26 @@ int main(int argc, char* argv[])
         }
     }
     in.close();
+
+    test();
+
     cout << "\n";
     return 0;
+}
+
+void test()
+{
+    for(int i = 0; i < 4; i++) {
+        for(int j = 0; j < 4; j++) {
+            std::cout << score_between_two_photos(i, j) << " ";
+        }
+        std::cout << score_between_a_photo_and_two_vertical(i, 0, 3) << " ";
+        std::cout << "\n";
+    }
+    for(int j = 0; j < 4; j++) {
+        std::cout << score_between_a_photo_and_two_vertical(j, 0, 3) << " ";
+    }
+    std::cout << score_between_two_photos(2, 3) << "\n";
+    std::cout << score_between_a_photo_and_two_vertical(1, 0, 3) << "\n";
+    cout << "added_tags = " << added_tags << "\n";
 }
