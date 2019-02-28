@@ -253,10 +253,10 @@ void local_search(slideshow& ss, bool do_not_remove = false)
                     j++;
                     continue;
                 }
-                if (photo_to_insert1 == photo_to_insert2) {
-                    continue;
-                }
                 for (auto& photo_to_insert2 : vertical_availables) {
+                    if (photo_to_insert1 == photo_to_insert2) {
+                        continue;
+                    }
                     int i = 0;
                     for (auto it = ss.begin(); it != ss.end(); it++, i++) {
                         if (i == slideshow_size - 1) {
@@ -265,7 +265,7 @@ void local_search(slideshow& ss, bool do_not_remove = false)
                         int min_of_the_pair = min(photo_to_insert1, photo_to_insert2);
                         int max_of_the_pair = max(photo_to_insert1, photo_to_insert2);
                         frame f(min_of_the_pair, max_of_the_pair);
-                        int candidate_score = ss.score_of_inserting_two_verticals_after_index(it, &f); // DONE
+                        int candidate_score = ss.score_of_inserting_after_index(it, &f); // DONE
                         if (candidate_score > best_score) {
                             best_score = candidate_score;
                             best_position_to_insert_after = it;
@@ -277,6 +277,8 @@ void local_search(slideshow& ss, bool do_not_remove = false)
                 }
                 j++;
             }
+            int min_of_the_pair = min(best_photo_index1, best_photo_index2);
+            int max_of_the_pair = max(best_photo_index1, best_photo_index2);
             frame f(min_of_the_pair, max_of_the_pair);
             ss.insert_after_index(best_position_to_insert_after, &f); // DONE
             vertical_availables.erase(std::remove(vertical_availables.begin(), vertical_availables.end(), best_photo_index1), vertical_availables.end());
@@ -287,7 +289,7 @@ void local_search(slideshow& ss, bool do_not_remove = false)
     }
     if (x % 3 == 2) {
         if (do_not_remove) {
-            local_search(f, do_not_remove = true);
+            local_search(ss, do_not_remove = true);
         }
         // remove one picture and add another one
         // here I remove one picture
@@ -300,7 +302,10 @@ void local_search(slideshow& ss, bool do_not_remove = false)
             if (i == 0 || i == slideshow_size - 1) {
                 continue;
             }
-            int score = score_between_two_positions(i - 1, i) + score_between_two_positions(i, i + 1);
+            auto pred_it = it;
+            auto succ_it = it;
+            pred_it--;
+            int score = ss.score_between_two_positions(pred_it) + ss.score_between_two_positions(it);
             if (score < min_score) {
                 min_score = score;
                 min_position = i;
@@ -313,9 +318,9 @@ void local_search(slideshow& ss, bool do_not_remove = false)
             horizontal_availables.insert(i);
         }
         // here I add another one
-        local_search(f, true);
+        local_search(ss, true);
     }
-    local_search(ss);
+    local_search(ss, false);
 }
 
 void test()
