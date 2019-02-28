@@ -108,7 +108,14 @@ typedef int ti;
 
 struct frame {
     frame(pi p1, pi p2){
-        set_union(pictures[p1].tags.begin(), pictures[p1].tags.end(),pictures[p2].tags.begin(), pictures[p2].tags.end(),inserter(tags,tags.begin()));
+        if(p2==-1){
+            tags=photos[p1].tags;
+            images.push_front(p1);
+        } else {
+            set_union(photos[p1].tags.begin(), photos[p1].tags.end(),photos[p2].tags.begin(), photos[p2].tags.end(),inserter(tags,tags.begin()));
+            images.push_front(p1);
+            images.push_front(p2);
+        }
     }
     
     d niceness(frame& other) {
