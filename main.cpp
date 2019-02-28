@@ -162,7 +162,7 @@ struct slideshow {
 //----------------------------------------------------------------------------------------------------
 
 void test();
-void local_search(slideshow& ss);
+void local_search(slideshow& ss, bool do_not_remove);
 
 int main(int argc, char* argv[])
 {
@@ -197,7 +197,13 @@ int main(int argc, char* argv[])
     }
     in.close();
 
-    test();
+    frame f1(0, -1);
+    frame f2(1, -1);
+    slideshow ss;
+    ss.insert_after_index(ss.begin(), &f1);
+    ss.insert_after_index(ss.begin(), &f2);
+    local_search(ss, false);
+    // test();
 
     cout << "\n";
     return 0;
