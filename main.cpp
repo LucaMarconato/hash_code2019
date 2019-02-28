@@ -117,7 +117,10 @@ struct frame {
             images.push_front(p2);
         }
     }
-    
+    ~frame(){
+        tags.clear();
+        images.clear();
+    }    
     d niceness(frame& other) {
         set<ti> tmp;
         set_intersection(tags.begin(),tags.end(),other.tags.begin(),other.tags.end(),tmp.begin());
