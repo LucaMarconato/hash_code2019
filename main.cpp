@@ -19,21 +19,20 @@ int added_tags = 0;
 
 photo photos[100000];
 
+map<pair<int, int>, 
+
 int main(int argc, char* argv[])
 {
     string filename = argv[1] + (string) "_example.txt";
     ifstream in(filename);
     int lines;
     in >> lines;
-    // cout << "lines = " << lines << "\n";
     for (int i = 0; i < lines; i++) {
         char orientation;
         in >> orientation;
         photos[i].vertical = orientation == 'V';
-        // cout << "orientation = " << orientation << "\n";
         int tags_count;
         in >> tags_count;
-        // cout << "tags_count = " << tags_count << "\n";
         string tag;
         for (int j = 0; j < tags_count; j++) {
             in >> tag;
@@ -48,11 +47,6 @@ int main(int argc, char* argv[])
         }
     }
     in.close();
-    // cout << "added_tags = " << added_tags << "\n";
-    // cout << photos[0].vertical;
-    // for (auto& e : photos[90].tags) {
-    //     cout << e << " ";
-    // }
     cout << "\n";
     return 0;
 }
