@@ -44,9 +44,6 @@ photo photos[100000];
 set<int> vertical_availables;
 set<int> horizontal_availables;
 
-void test();
-void local_search(slideshow& ss, bool do_not_remove = false);
-
 int score_between_two_set_of_tags(set<int>& set1, set<int>& set2)
 {
     set<int> intersection, diff1, diff2;
@@ -107,30 +104,33 @@ typedef int pi;           // photo index
 typedef int ti;
 
 struct frame {
-    frame(pi p1, pi p2){
-        if(p2==-1){
-            tags=photos[p1].tags;
+    frame(pi p1, pi p2)
+    {
+        if (p2 == -1) {
+            tags = photos[p1].tags;
             images.push_front(p1);
         } else {
-            set_union(photos[p1].tags.begin(), photos[p1].tags.end(),photos[p2].tags.begin(), photos[p2].tags.end(),inserter(tags,tags.begin()));
+            set_union(photos[p1].tags.begin(), photos[p1].tags.end(), photos[p2].tags.begin(), photos[p2].tags.end(), inserter(tags, tags.begin()));
             images.push_front(p1);
             images.push_front(p2);
         }
     }
-    ~frame(){
+    ~frame()
+    {
         tags.clear();
         images.clear();
-    }    
-    d niceness(frame& other) {
+    }
+    d niceness(frame& other)
+    {
         set<ti> tmp;
         set_intersection(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), tmp.begin());
-        int m = tmp.count();
+        int m = tmp.size();
         tmp.clear();
         set_difference(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), tmp.begin());
-        m = min(m, tmp.count());
+        m = min(m, tmp.size());
         tmp.clear();
         set_difference(other.tags.begin(), other.tags.end(), tags.begin(), tags.end(), tmp.begin());
-        m = min(m, tmp.count());
+        m = min(m, tmp.size());
         return m;
     }
 
@@ -155,11 +155,14 @@ struct slideshow {
         next++;
         return static_cast<int>((*idx)->niceness(*(*next)));
     }
-    iTerator begin(){return data.begin();}
-    iTerator end(){return data.end();}
+    iTerator begin() { return data.begin(); }
+    iTerator end() { return data.end(); }
     list<frame*> data;
-}
+};
 //----------------------------------------------------------------------------------------------------
+
+void test();
+void local_search(slideshow& ss);
 
 int main(int argc, char* argv[])
 {
@@ -208,7 +211,7 @@ void local_search(slideshow& ss, bool do_not_remove = false)
         if (horizontal_availables.size() > 0) {
             int slideshow_size = ss.size(); // DONE
             int best_photo_index = -1;
-            slideshow::iterator best_position_to_insert_after;
+            slideshow::iTerator best_position_to_insert_after;
             int best_score = -1;
             for (auto& photo_to_insert : horizontal_availables) {
                 int i = 0;
@@ -225,95 +228,94 @@ void local_search(slideshow& ss, bool do_not_remove = false)
                     }
                 }
             }
+            frame f(best_photo_index, -1);
+            ss.insert_after_index(best_position_to_insert_after, &f); // DONE
+            horizontal_availables.remove(best_photo_index);
+        } else {
+            x++;
         }
-        frame f(best_photo_index, -1);
-        ss.insert_after_index(best_position_to_insert_after, &f); // DONE
-        horizontal_availables.remove(best_photo_index);
-    } else {
-        x++;
     }
-}
-if (x % 3 == 1) {
-    // insert a new pair of vertical pictures or go to the next move
-    if (vertical_availables.size() > 2) {
-        int slideshow_size = ss.size(); // DONE
-        int best_photo_index1 = -1;
-        int best_photo_index2 = -1;
-        slideshow::iterator best_position_to_insert_after;
-        int best_score = -1;
-        int max_vertical_to_analyze = 1000;
-        int vertical_analyzed = 0;
-        xorshift();
-        int random_vertical = x % vertical_availables.size();
-        int j = 0;
-        for (auto& photo_to_insert1 : vertical_availables) {
-            if (j < random_vertical) {
-                j++;
-                continue;
-            }
-            if (photo_to_insert1 == photo_to_insert2) {
-                continue;
-            }
-            for (auto& photo_to_insert2 : vertical_availables) {
-                int i = 0;
-                for (auto it = ss.begin(); it != ss.end(); it++, i++) {
-                    if (i == slideshow_size - 1) {
-                        continue;
-                    }
-                    int min_of_the_pair = min(photo_to_insert1, photo_to_insert2);
-                    int max_of_the_pair = max(photo_to_insert1, photo_to_insert2);
-                    frame f(min_of_the_pair, max_of_the_pair);
-                    int candidate_score = ss.score_of_inserting_two_verticals_after_index(it, &f); // DONE
-                    if (candidate_score > best_score) {
-                        best_score = candidate_score;
-                        best_position_to_insert_after = it;
-                        best_photo_index1 = photo_to_insert1;
-                        best_photo_index2 = photo_to_insert2;
-                    }
+    if (x % 3 == 1) {
+        // insert a new pair of vertical pictures or go to the next move
+        if (vertical_availables.size() > 2) {
+            int slideshow_size = ss.size(); // DONE
+            int best_photo_index1 = -1;
+            int best_photo_index2 = -1;
+            slideshow::iTerator best_position_to_insert_after;
+            int best_score = -1;
+            int max_vertical_to_analyze = 1000;
+            int vertical_analyzed = 0;
+            xorshift();
+            int random_vertical = x % vertical_availables.size();
+            int j = 0;
+            for (auto& photo_to_insert1 : vertical_availables) {
+                if (j < random_vertical) {
+                    j++;
+                    continue;
                 }
-                vertical_analyzed++;
+                if (photo_to_insert1 == photo_to_insert2) {
+                    continue;
+                }
+                for (auto& photo_to_insert2 : vertical_availables) {
+                    int i = 0;
+                    for (auto it = ss.begin(); it != ss.end(); it++, i++) {
+                        if (i == slideshow_size - 1) {
+                            continue;
+                        }
+                        int min_of_the_pair = min(photo_to_insert1, photo_to_insert2);
+                        int max_of_the_pair = max(photo_to_insert1, photo_to_insert2);
+                        frame f(min_of_the_pair, max_of_the_pair);
+                        int candidate_score = ss.score_of_inserting_two_verticals_after_index(it, &f); // DONE
+                        if (candidate_score > best_score) {
+                            best_score = candidate_score;
+                            best_position_to_insert_after = it;
+                            best_photo_index1 = photo_to_insert1;
+                            best_photo_index2 = photo_to_insert2;
+                        }
+                    }
+                    vertical_analyzed++;
+                }
+                j++;
             }
-            j++;
-        }
-        frame f(min_of_the_pair, max_of_the_pair);
-        ss.insert_after_index(best_position_to_insert_after, &f); // DONE
-        vertical_availables.remove(best_photo_index1);
-        vertical_availables.remove(best_photo_index2);
-    } else {
-        x++;
-    }
-}
-if (x % 3 == 2) {
-    if (do_not_remove) {
-        local_search(f, do_not_remove = true);
-    }
-    // remove one picture and add another one
-    // here I remove one picture
-    int slideshow_size = ss.size(); // DONE
-    int min_score = 100000;
-    int min_position = -1;
-    int i = 0;
-    auto it = ss.begin();
-    for (; it != ss.end(); it++, i++) {
-        if (i == 0 || i == slideshow_size - 1) {
-            continue;
-        }
-        int score = score_between_two_positions(i - 1, i) + score_between_two_positions(i, i + 1);
-        if (score < min_score) {
-            min_score = score;
-            min_position = i;
+            frame f(min_of_the_pair, max_of_the_pair);
+            ss.insert_after_index(best_position_to_insert_after, &f); // DONE
+            vertical_availables.remove(best_photo_index1);
+            vertical_availables.remove(best_photo_index2);
+        } else {
+            x++;
         }
     }
-    ss.remove_at_index(it); // DONE
-    if (photos[i].vertical) {
-        vertical_availables.insert(i);
-    } else {
-        horizontal_availables.insert(i);
+    if (x % 3 == 2) {
+        if (do_not_remove) {
+            local_search(f, do_not_remove = true);
+        }
+        // remove one picture and add another one
+        // here I remove one picture
+        int slideshow_size = ss.size(); // DONE
+        int min_score = 100000;
+        int min_position = -1;
+        int i = 0;
+        auto it = ss.begin();
+        for (; it != ss.end(); it++, i++) {
+            if (i == 0 || i == slideshow_size - 1) {
+                continue;
+            }
+            int score = score_between_two_positions(i - 1, i) + score_between_two_positions(i, i + 1);
+            if (score < min_score) {
+                min_score = score;
+                min_position = i;
+            }
+        }
+        ss.remove_at_index(it); // DONE
+        if (photos[i].vertical) {
+            vertical_availables.insert(i);
+        } else {
+            horizontal_availables.insert(i);
+        }
+        // here I add another one
+        local_search(f, do_not_remove = true;)
     }
-    // here I add another one
-    local_search(f, do_not_remove = true;)
-}
-local_search(f);
+    local_search(f);
 }
 
 void test()
