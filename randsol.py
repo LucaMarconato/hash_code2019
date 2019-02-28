@@ -57,7 +57,6 @@ def solve(fname):
     solf.close()
     
 
-pp = PdfPages('Eda.pdf')
 aplot = solve('a_example.txt')
 #pp.savefig(aplot)
 aplot = solve('b_example.txt')
@@ -68,4 +67,3 @@ aplot = solve('d_example.txt')
 #pp.savefig(aplot)
 aplot = solve('e_example.txt')
 #pp.savefig(aplot)
-pp.close()
