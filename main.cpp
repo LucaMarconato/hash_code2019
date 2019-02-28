@@ -147,7 +147,7 @@ struct slideshow {
     {
         auto next = idx;
         next++;
-        return static_cast<int>((*idx)->niceness(*(*fr))) - static_cast<int>((*idx)->niceness(*(*next)));
+        return static_cast<int>((*idx)->niceness(*fr)) - static_cast<int>((*idx)->niceness(*(*next)));
     }
     int score_between_two_positions(iTerator idx)
     {
