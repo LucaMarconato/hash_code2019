@@ -16,12 +16,13 @@ struct photo {
     set<int> tags;
 };
 int added_tags = 0;
-
 map<pair<int, int>, set<int>> tags_of_pairs_of_vertical_photos;
-
 photo photos[100000];
+set<int> vertical_availables;
+set<int> horizontal_availables;
 
 void test();
+void local_search();
 
 int score_between_two_set_of_tags(set<int>& set1, set<int>& set2)
 {
@@ -87,6 +88,11 @@ int main(int argc, char* argv[])
         char orientation;
         in >> orientation;
         photos[i].vertical = orientation == 'V';
+        if (photos[i].vertical) {
+            vertical_availables.insert(i);
+        } else {
+            horizontal_availables.insert(i);
+        }
         int tags_count;
         in >> tags_count;
         string tag;
@@ -110,16 +116,18 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+void local_search() {}
+
 void test()
 {
-    for(int i = 0; i < 4; i++) {
-        for(int j = 0; j < 4; j++) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
             std::cout << score_between_two_photos(i, j) << " ";
         }
         std::cout << score_between_a_photo_and_two_vertical(i, 0, 3) << " ";
         std::cout << "\n";
     }
-    for(int j = 0; j < 4; j++) {
+    for (int j = 0; j < 4; j++) {
         std::cout << score_between_a_photo_and_two_vertical(j, 0, 3) << " ";
     }
     std::cout << score_between_two_photos(2, 3) << "\n";
