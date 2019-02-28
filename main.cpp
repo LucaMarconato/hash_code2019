@@ -144,7 +144,8 @@ struct slideshow
         next++;
         return static_cast<int>((*idx)->niceness(*(*next)));
     }
-    
+    iTerator begin(){return data.begin();}
+    iTerator end(){return data.end();}
     list<frame*> data;
 }
 //----------------------------------------------------------------------------------------------------
