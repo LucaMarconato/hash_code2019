@@ -123,13 +123,13 @@ struct frame {
     d niceness(frame& other)
     {
         set<ti> tmp;
-        set_intersection(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), tmp.begin());
+        set_intersection(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), std::inserter(tmp, tmp.begin()));
         size_t m = tmp.size();
         tmp.clear();
-        set_difference(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), tmp.begin());
+        set_difference(tags.begin(), tags.end(), other.tags.begin(), other.tags.end(), std::inserter(tmp, tmp.begin()));
         m = min(m, tmp.size());
         tmp.clear();
-        set_difference(other.tags.begin(), other.tags.end(), tags.begin(), tags.end(), tmp.begin());
+        set_difference(other.tags.begin(), other.tags.end(), tags.begin(), tags.end(), std::inserter(tmp, tmp.begin()));
         m = min(m, tmp.size());
         return m;
     }
@@ -230,7 +230,8 @@ void local_search(slideshow& ss, bool do_not_remove = false)
             }
             frame f(best_photo_index, -1);
             ss.insert_after_index(best_position_to_insert_after, &f); // DONE
-            horizontal_availables.erase(std::remove(horizontal_availables.begin(), horizontal_availables.end(), best_photo_index), horizontal_availables.end());
+            auto it = horizontal_availables.find(best_photo_index);
+            horizontal_availables.erase(it);
         } else {
             x++;
         }
@@ -281,8 +282,10 @@ void local_search(slideshow& ss, bool do_not_remove = false)
             int max_of_the_pair = max(best_photo_index1, best_photo_index2);
             frame f(min_of_the_pair, max_of_the_pair);
             ss.insert_after_index(best_position_to_insert_after, &f); // DONE
-            vertical_availables.erase(std::remove(vertical_availables.begin(), vertical_availables.end(), best_photo_index1), vertical_availables.end());
-            vertical_availables.erase(std::remove(vertical_availables.begin(), vertical_availables.end(), best_photo_index2), vertical_availables.end());
+            auto it1 = vertical_availables.find(best_photo_index1);
+            auto it2 = vertical_availables.find(best_photo_index2);
+            vertical_availables.erase(it1);
+            vertical_availables.erase(it2);
         } else {
             x++;
         }
